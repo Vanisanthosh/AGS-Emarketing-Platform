@@ -19,6 +19,7 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import { AuthGuard } from "./components/common/AuthGuard";
+import UserLoader from "./components/common/UserLoader";
 
 export default function App() {
   return (
@@ -28,7 +29,18 @@ export default function App() {
         <Routes>
           {/* Dashboard Layout */}
           <Route element={ <AuthGuard> <AppLayout /> </AuthGuard> } >
-            <Route index path="/" element={<Home />} />
+            {/* <Route index path="/" element={<Home />} /> */}
+            <Route
+              path="/"
+              element={
+                <AuthGuard>
+                  <UserLoader>
+                    <Home />
+                  </UserLoader>
+                </AuthGuard>
+              }
+            />  
+
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />

@@ -5,15 +5,13 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
-import { useLoginMutation, useLazyGetUserQuery } from '@/services/authApi';
+import { useLoginMutation } from '@/services/authApi';
 import { useAppDispatch } from "../../store/hooks";
-import { setCredentials } from "../../store/slices/authSlice";
 import { useNavigate } from 'react-router-dom'
 import Alert from "../ui/alert/Alert";
 import { handleAuthSuccess } from "@/utils/authHelpers";
 
 export default function SignInForm() {
-  const [triggerGetUser] = useLazyGetUserQuery();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -52,13 +50,7 @@ export default function SignInForm() {
 
     try {
       const res = await login({ email, password }).unwrap();
-      console.log("Login response:", res);
-      await handleAuthSuccess(res.token, triggerGetUser, dispatch, () => navigate('/'));
-      //dispatch(setCredentials({ user: res.user, token: res.token }));
-      //dispatch(setCredentials(res))
-      //console.log("Login successful");
-      //navigate('/'); // or wherever you want
-      // Handle success: redirect, show toast, etc.
+      await handleAuthSuccess(res.token, dispatch, () => navigate('/'));
     } catch (err) {
       console.error("Login failed", err);
       // Handle login error

@@ -6,7 +6,6 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { useRegisterMutation, useLazyGetUserQuery } from "@/services/authApi";
 import { useAppDispatch } from '@/store/hooks'
-import { setCredentials } from '@/store/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
 import Alert from "../ui/alert/Alert";
 import { handleAuthSuccess } from "@/utils/authHelpers";
@@ -15,11 +14,13 @@ export default function SignUpForm() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [registerUser, { isLoading, error }] = useRegisterMutation();
+  const [registerUser, { error }] = useRegisterMutation();
   const [triggerGetUser] = useLazyGetUserQuery();
   
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState('');
 
   interface FormData {
     name: string;
@@ -73,12 +74,6 @@ export default function SignUpForm() {
       }
     }
 
-    // Terms checkbox
-    // if (!isChecked) {
-    //   newErrors.terms =
-    //     "You must agree to the Terms and Privacy Policy to continue.";
-    // }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -97,16 +92,17 @@ export default function SignUpForm() {
       setErrors(prev => ({ ...prev, ...newErrors }));
       return;
     }
-
-    console.log("Submitting:", formData);
     // Handle your API call here
     try {
       const response = await registerUser(formData).unwrap();
-      console.log("Registration response:", response);
       // Optionally store user/token if API returns it
       if (response.token && response.user) {
         await handleAuthSuccess(response.token, triggerGetUser, dispatch, () => {
-          navigate("/");
+          setSuccessMessage("Registration successful! Please log in.");
+          // Delay navigation by 2 seconds so the user sees the message
+          setTimeout(() => {
+            navigate("/signin");
+          }, 2000);
         });
       }
       
@@ -120,6 +116,9 @@ export default function SignUpForm() {
     <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
       <div className="absolute top-[30px] right-[30px]">
         {error && <Alert variant="error" title="" message="Invalid Email and password" />}
+      </div>
+      <div className="absolute top-[30px] right-[30px]">
+        {successMessage && ( <Alert variant="success" title="" message={successMessage} /> )}
       </div>
       <div className="w-full max-w-md mx-auto mb-5 sm:pt-10">
         <Link
