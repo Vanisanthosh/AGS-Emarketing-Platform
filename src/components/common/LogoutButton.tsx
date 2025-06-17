@@ -1,15 +1,23 @@
 import { useDispatch } from 'react-redux';
-import { logout } from '../../store/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { logout } from '../../store/slices/authSlice';
+import { useLogoutMutation } from "@/services/authApi";
 
 const LogoutButton = () => {
+  const [triggerLogout] = useLogoutMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/signin');
-  };
+  const handleLogout = async () => {
+    try {
+      await triggerLogout()?.unwrap() // Calls API
+      dispatch(logout()) // Clears Redux + localStorage
+      navigate('/signin')
+    } catch (err) {
+      console.error('Logout failed:', err)
+      // Optional: show toast or error UI
+    }
+  }
 
   return (
     <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">

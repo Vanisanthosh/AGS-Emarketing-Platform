@@ -75,10 +75,20 @@ export const authApi = createApi({
         },
       }),
     }),
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: 'logout',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+    }),
   }),
 })
  
 // Export hooks
-export const { useLoginMutation, useRegisterMutation, useLazyGetUserQuery } = authApi
+export const { useLoginMutation, useRegisterMutation, useLazyGetUserQuery, useLogoutMutation } = authApi
  
  
